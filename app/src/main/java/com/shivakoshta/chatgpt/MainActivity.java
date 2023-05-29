@@ -110,13 +110,12 @@ void callAPI(String question){
 //        jsonBody.put("max_tokens",4000);
 //        jsonBody.put("temperature",0);
         jsonBody.put("model","gpt-3.5-turbo");
-        jsonBody.put("user", "Shiva07619981");
+        jsonBody.put("user","Shiva07619981");
         JSONArray MsgArray = new JSONArray();
 
         JSONObject obj = new JSONObject();
         obj.put("role","user");
         obj.put("content",question);
-        obj.put("name", "Shiva07619981");
         MsgArray.put(obj);
         jsonBody.put("messages",MsgArray);
     } catch (JSONException e) {
@@ -125,7 +124,7 @@ void callAPI(String question){
     RequestBody body = RequestBody.create(jsonBody.toString(),JSON);
     Request request = new Request.Builder()
             .url("https://api.openai.com/v1/chat/completions")
-            .header("Authorization","Bearer YOUR_API_KEY_HERE")
+            .header("Authorization","Bearer API_KEY_HERE")
             .post(body)
             .build();
     client.newCall(request).enqueue(new Callback() {
