@@ -8,7 +8,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/left_chat_view"
         android:background="@drawable/rounded_corner"
-        android:backgroundTint="#484848"
+        android:backgroundTint="@color/GPTgrey_dark"
         android:padding="8dp"
         android:layout_alignParentStart="true"
         android:layout_marginEnd="80dp">
@@ -19,7 +19,9 @@
             android:textColor="@color/white"
             android:fontFamily="@font/robotolight"
             android:id="@+id/left_chat_text_view"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textIsSelectable="true"
+            />
     </LinearLayout>
 
     <LinearLayout
@@ -39,6 +41,7 @@
             android:fontFamily="@font/robotolight"
             android:id="@+id/right_chat_text_view"
             android:textSize="18sp"
+            android:textIsSelectable="true"
             />
     </LinearLayout>
 

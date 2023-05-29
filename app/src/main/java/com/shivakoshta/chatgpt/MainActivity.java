@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 
 import okhttp3.Call;
@@ -41,13 +44,15 @@ public class MainActivity extends AppCompatActivity {
     public static final MediaType JSON
             = MediaType.get("application/json; charset=utf-8");
 
-    OkHttpClient client = new OkHttpClient();
+    OkHttpClient client = new OkHttpClient.Builder()
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toast.makeText(this, "ChatGPT Clone By Shiva", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "ChatGPT Clone By Shiva", Toast.LENGTH_LONG).show();
         messageList = new ArrayList<>();
         sendMessage = findViewById(R.id.message_edit_text);
         sendButton = findViewById(R.id.send_button);
@@ -65,10 +70,14 @@ public class MainActivity extends AppCompatActivity {
 
         sendButton.setOnClickListener((v) -> {
             String question = sendMessage.getText().toString().trim();
-            addToChat(question, Message_model.SENT_BY_ME);
-            sendMessage.setText("");
-            callAPI(question);
-            welcomeText.setVisibility(View.GONE);
+            if(question.length()!=0)
+            {
+                addToChat(question, Message_model.SENT_BY_ME);
+                sendMessage.setText("");
+                callAPI(question);
+                welcomeText.setVisibility(View.GONE);
+            }
+
         });
     }
 
@@ -86,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     void addResponse(String response)
     {
         if(messageList.size()!=0)
-        messageList.remove(messageList.size()-1);
+            messageList.remove(messageList.size()-1);
         addToChat(response,Message_model.SENT_BY_BOT);
     }
 
@@ -96,20 +105,29 @@ void callAPI(String question){
 
     JSONObject jsonBody = new JSONObject();
     try {
-        jsonBody.put("model","text-davinci-003");
-        jsonBody.put("prompt",question);
-        jsonBody.put("max_tokens",4000);
-        jsonBody.put("temperature",0);
+//        jsonBody.put("model","text-davinci-003");
+//        jsonBody.put("prompt",question);
+//        jsonBody.put("max_tokens",4000);
+//        jsonBody.put("temperature",0);
+        jsonBody.put("model","gpt-3.5-turbo");
+        jsonBody.put("user", "Shiva07619981");
+        JSONArray MsgArray = new JSONArray();
+
+        JSONObject obj = new JSONObject();
+        obj.put("role","user");
+        obj.put("content",question);
+        obj.put("name", "Shiva07619981");
+        MsgArray.put(obj);
+        jsonBody.put("messages",MsgArray);
     } catch (JSONException e) {
         e.printStackTrace();
     }
     RequestBody body = RequestBody.create(jsonBody.toString(),JSON);
     Request request = new Request.Builder()
-            .url("https://api.openai.com/v1/completions")
-            .header("Authorization","Bearer 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")
+            .url("https://api.openai.com/v1/chat/completions")
+            .header("Authorization","Bearer YOUR_API_KEY_HERE")
             .post(body)
             .build();
-//            .header("Authorization","Bearer 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")
     client.newCall(request).enqueue(new Callback() {
         @Override
         public void onFailure(@NonNull Call call, @NonNull IOException e) {
@@ -123,7 +141,9 @@ void callAPI(String question){
                 try {
                     jsonObject = new JSONObject(response.body().string());
                     JSONArray jsonArray = jsonObject.getJSONArray("choices");
-                    String result = jsonArray.getJSONObject(0).getString("text");
+                    String result = jsonArray.getJSONObject(0)
+                            .getJSONObject("message")
+                            .getString("content");
                     addResponse(result.trim());
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -9,5 +9,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="GPTgreen">#00A67E</color>
     <color name="GPTgreenDark">#008867</color>
-    <color name="GPTgrey">#676767</color>
+    <color name="GPTgrey">#343541</color>
+    <color name="GPTgrey_dark">#25262F</color>
 </resources>
